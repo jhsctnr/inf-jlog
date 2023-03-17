@@ -1,0 +1,50 @@
+package com.jlog.api.controller;
+
+import com.jlog.api.exception.JlogException;
+import com.jlog.api.response.ErrorResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@Slf4j
+@ControllerAdvice
+public class ExceptionController {
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ErrorResponse invalidRequestHandler(MethodArgumentNotValidException e) {
+//            FieldError fieldError = e.getFieldError();
+//            String field = fieldError.getField();
+//            String message = fieldError.getDefaultMessage();
+        ErrorResponse response = ErrorResponse.builder()
+                .code("400")
+                .message("잘못된 요청입니다.")
+                .build();
+        for (FieldError fieldError : e.getFieldErrors()) {
+            response.addValidation(fieldError.getField(), fieldError.getDefaultMessage());
+        }
+        return response;
+    }
+
+    @ResponseBody
+    @ExceptionHandler(JlogException.class)
+    public ResponseEntity<ErrorResponse> jlogException(JlogException e) {
+        int statusCode = e.getStatusCode();
+        ErrorResponse body = ErrorResponse.builder()
+                .code(String.valueOf(statusCode))
+                .message(e.getMessage())
+                .validation(e.getValidatioin())
+                .build();
+
+        // 응답 json validation -> title: 제목에 바보를 포함할 수 없습니다.
+
+        return ResponseEntity.status(statusCode).body(body);
+    }
+}
