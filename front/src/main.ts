@@ -4,12 +4,12 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
+import "normalize.css"
+
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 
 import 'bootstrap/dist/css/bootstrap-utilities.css'
-
-import './assets/main.css'
 
 const app = createApp(App)
 
