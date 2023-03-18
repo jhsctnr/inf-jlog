@@ -1,6 +1,7 @@
 HELP.md
 .gradle
 build/
+*.jar
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
@@ -41,7 +42,6 @@ out/
 *.iml
 *.ipr
 *.iws
-*.jar
 *.sw?
 *~
 .#*

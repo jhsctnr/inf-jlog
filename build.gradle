@@ -73,3 +73,7 @@ bootJar {
     }
 
 }
+
+jar {
+    enabled = false
+}
