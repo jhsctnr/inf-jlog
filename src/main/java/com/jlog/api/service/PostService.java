@@ -30,8 +30,6 @@ public class PostService {
                 .content(postCreate.getContent())
                 .build();
 
-        System.out.println("안녕하세유");
-
         postRepository.save(post);
     }
 
