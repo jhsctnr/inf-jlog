@@ -16,8 +16,9 @@ spring:
     password:
     driver-class-name: org.h2.Driver
 
-  jpa:
-    defer-datasource-initialization: true
+#  jpa:
+#    defer-datasource-initialization: true
 
-  sql:
-    init-model: always
+#  sql:
+#    init:
+#      mode: always

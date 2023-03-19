@@ -7,3 +7,8 @@ Content-Type: application/json
   "email": "jhseong112@naver.com",
   "password": "1234"
 }
+
+### 인증 페이지 요청
+GET http://localhost:8080/foo
+Content-Type: application/json
+Cookie: SESSION=4eadb6a7-50db-4943-bcfd-c692b6cfde8b

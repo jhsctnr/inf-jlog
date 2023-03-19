@@ -6,9 +6,7 @@ import com.jlog.api.domain.Session;
 import com.jlog.api.repository.MemberRepository;
 import com.jlog.api.repository.SessionRepository;
 import com.jlog.api.request.Login;
-import com.jlog.api.request.PostCreate;
-import org.assertj.core.api.Assertions;
-import org.hamcrest.Matchers;
+import com.jlog.api.request.Signup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,16 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -130,6 +127,67 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.accessToken", notNullValue()))
                 .andDo(print());
 
+    }
+
+    @Test
+    @DisplayName("로그인 후 권한이 필요한 페이지에 접속한다 /foo")
+    void test4() throws Exception {
+        // given
+        Member member = memberRepository.save(Member.builder()
+                .name("해성")
+                .email("jhseong112@naver.com")
+                .password("1234")
+                .build());
+        Session session = member.addSession();
+        memberRepository.save(member);
+
+        // expected
+        mockMvc.perform(get("/foo")
+                        .contentType(APPLICATION_JSON)
+                        .header("Authorization", session.getAccessToken())
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("로그인 후 검증되지 않은 세션 값으로 권한이 필요한 페이지에 접속할 수 없다.")
+    void test5() throws Exception {
+        // given
+        Member member = memberRepository.save(Member.builder()
+                .name("해성")
+                .email("jhseong112@naver.com")
+                .password("1234")
+                .build());
+        Session session = member.addSession();
+        memberRepository.save(member);
+
+        // expected
+        mockMvc.perform(get("/foo")
+                        .contentType(APPLICATION_JSON)
+                        .header("Authorization", session.getAccessToken() + "-other")
+                )
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("회원가입")
+    void test6() throws Exception {
+        // given
+        Signup signup = Signup.builder()
+                .password("1234")
+                .email("jhseong112@naver.com")
+                .name("정해성")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/auth/signup")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signup))
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test

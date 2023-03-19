@@ -31,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -64,7 +63,6 @@ public class PostController {
         request.validate();
         postService.write(request);
     }
-
 
     /**
      * /posts -> 글 전체 조회(검색 + 페이징)
