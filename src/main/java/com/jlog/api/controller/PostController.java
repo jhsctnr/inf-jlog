@@ -21,6 +21,7 @@ package com.jlog.api.controller;
  * - Spring RestDocs 는 Test 케이스 실행 -> 문서를 생성해준다.
  */
 
+import com.jlog.api.config.data.UserSession;
 import com.jlog.api.request.PostCreate;
 import com.jlog.api.request.PostEdit;
 import com.jlog.api.request.PostSearch;
@@ -30,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -41,8 +43,14 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/foo")
-    public String foo() {
-        return "foo";
+    public String foo(UserSession userSession) {
+        log.info(">>> {}", userSession.name);
+        return userSession.name;
+    }
+
+    @GetMapping("/bar")
+    public String bar(UserSession userSession) {
+        return "인증이 필요한 페이지";
     }
 
     // 글 등록, 글 단 건 조회, 글 리스트 조회
@@ -87,6 +95,12 @@ public class PostController {
     // GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD, TRACE, CONNECT
     // 글 등록
     // POST Method
+
+//    @GetMapping("/foo")
+//    public String foo(@RequestAttribute String userName) {
+//        log.info(">>> {}", userName);
+//        return "foo";
+//    }
 
 //    @PostMapping("/posts") // content-type -> json
 //    public void post(@RequestBody @Valid PostCreate request, @RequestHeader String authorization) {
