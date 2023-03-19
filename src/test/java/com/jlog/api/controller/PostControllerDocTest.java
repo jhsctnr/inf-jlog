@@ -96,7 +96,6 @@ public class PostControllerDocTest {
                                 fieldWithPath("title").description("제목").attributes(key("constraint").value("제약조건")),
                                 fieldWithPath("content").description("내용").optional()
                         )
-
                 ));
     }
 }
