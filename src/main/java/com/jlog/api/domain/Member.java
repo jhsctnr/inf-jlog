@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -25,11 +27,22 @@ public class Member {
 
     private LocalDateTime createdAt;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
+    private List<Session> sessions = new ArrayList<>();
+
     @Builder
-    public Member(String name, String email, String password, LocalDateTime createdAt) {
+    public Member(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.createdAt = createdAt;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public Session addSession() {
+        Session session = Session.builder()
+                .member(this)
+                .build();
+        sessions.add(session);
+        return session;
     }
 }
