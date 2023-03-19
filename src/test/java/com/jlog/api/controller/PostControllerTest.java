@@ -40,28 +40,9 @@ class PostControllerTest {
         postRepository.deleteAll();
     }
 
-    @Test
-    @DisplayName("/posts 요청 성공 시 200 code를 반환한다.")
-    void test() throws Exception {
-        // given
-        PostCreate request = PostCreate.builder()
-                .title("제목입니다.")
-                .content("내용입니다.")
-                .build();
-        String json = objectMapper.writeValueAsString(request);
-
-        // expected // application/json  legacy -> x-www-form-urlencoded
-        mockMvc.perform(post("/posts")
-                        .contentType(APPLICATION_JSON)
-                        .content(json)
-                )
-                .andExpect(status().isOk())
-                .andExpect(content().string(""))
-                .andDo(print());
-    }
 
     @Test
-    @DisplayName("/posts 요청시 title 값은 필수다.")
+    @DisplayName("글 작성 요청시 title 값은 필수다.")
     void test2() throws Exception {
         // given
         PostCreate request = PostCreate.builder()
@@ -84,7 +65,7 @@ class PostControllerTest {
     }
 
     @Test
-    @DisplayName("/posts 요청시 DB에 값이 저장된다.")
+    @DisplayName("글 작성 요청시 DB에 값이 저장된다.")
     void test3() throws Exception {
         // given
         PostCreate request = PostCreate.builder()
@@ -95,9 +76,8 @@ class PostControllerTest {
 
         // when
         mockMvc.perform(post("/posts")
+                        .header("authorization", "wh")
                         .contentType(APPLICATION_JSON)
-                        // {"title": ""}
-                        // {"title": null}
                         .content(json)
                 )
                 .andExpect(status().isOk())

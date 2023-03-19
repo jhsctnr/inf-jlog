@@ -40,14 +40,23 @@ public class PostController {
 
     private final PostService postService;
 
+    @GetMapping("/foo")
+    public String foo() {
+        return "foo";
+    }
+
     // 글 등록, 글 단 건 조회, 글 리스트 조회
     // CRUD -> Create, Read, Update, Delete
 
+    // 1. GET Parameter    -> ?
+    // 2. POST(body) value -> X
+    // 3. Header
     @PostMapping("/posts") // content-type -> json
     public void post(@RequestBody @Valid PostCreate request) {
         request.validate();
         postService.write(request);
     }
+
 
     /**
      * /posts -> 글 전체 조회(검색 + 페이징)
@@ -78,6 +87,22 @@ public class PostController {
     // GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD, TRACE, CONNECT
     // 글 등록
     // POST Method
+
+//    @PostMapping("/posts") // content-type -> json
+//    public void post(@RequestBody @Valid PostCreate request, @RequestHeader String authorization) {
+//        if (authorization.equals("hsman")) {
+//            request.validate();
+//            postService.write(request);
+//        }
+//    }
+
+//    @PostMapping("/posts") // content-type -> json
+//    public void post(@RequestBody @Valid PostCreate request, @RequestParam String authorization) {
+//        if (authorization.equals("hsman")) {
+//            request.validate();
+//            postService.write(request);
+//        }
+//    }
 
 //    @PostMapping("/posts") // content-type -> x-www-form-urlencoded
 //    public String post(@RequestParam String title, @RequestParam String content) {
