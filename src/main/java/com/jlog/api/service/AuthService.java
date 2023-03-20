@@ -1,5 +1,6 @@
 package com.jlog.api.service;
 
+import com.jlog.api.crypto.PasswordEncoder;
 import com.jlog.api.domain.Member;
 import com.jlog.api.domain.Session;
 import com.jlog.api.exception.AlreadyExistsEmailException;
@@ -18,13 +19,24 @@ import java.util.Optional;
 public class AuthService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public String signin(Login login) {
 
         // DB에서 조회
-        Member member = memberRepository.findByEmailAndPassword(login.getEmail(), login.getPassword())
+//        Member member = memberRepository.findByEmailAndPassword(login.getEmail(), login.getPassword())
+//                .orElseThrow(InvalidSigninInformation::new);
+
+        Member member = memberRepository.findByEmail(login.getEmail())
                 .orElseThrow(InvalidSigninInformation::new);
+
+
+        boolean matches = passwordEncoder.matches(login.getPassword(), member.getPassword());
+        if (!matches) {
+            throw new InvalidSigninInformation();
+        }
+
         // 토근을 응답
         Session session = member.addSession();
         return session.getAccessToken();
@@ -36,9 +48,11 @@ public class AuthService {
             throw new AlreadyExistsEmailException();
         }
 
+        String encryptedPassword = passwordEncoder.encrypt(signup.getPassword());
+
         Member member = Member.builder()
                 .name(signup.getName())
-                .password(signup.getPassword())
+                .password(encryptedPassword)
                 .email(signup.getEmail())
                 .build();
         memberRepository.save(member);
