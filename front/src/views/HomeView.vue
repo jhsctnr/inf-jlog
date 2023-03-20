@@ -5,13 +5,13 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const posts = ref([])
+const posts = ref<any[]>([])
 
 axios.get('/api/posts?page=1&size=5').then((response) => {
   response.data.forEach((r: any) => {
     posts.value.push(r)
-  })
-})
+  });
+});
 </script>
 
 <template>
