@@ -22,24 +22,24 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public String signin(Login login) {
+    public Long signin(Login login) {
 
         // DB에서 조회
-//        Member member = memberRepository.findByEmailAndPassword(login.getEmail(), login.getPassword())
-//                .orElseThrow(InvalidSigninInformation::new);
-
-        Member member = memberRepository.findByEmail(login.getEmail())
+        Member member = memberRepository.findByEmailAndPassword(login.getEmail(), login.getPassword())
                 .orElseThrow(InvalidSigninInformation::new);
 
+//        Member member = memberRepository.findByEmail(login.getEmail())
+//                .orElseThrow(InvalidSigninInformation::new);
 
-        boolean matches = passwordEncoder.matches(login.getPassword(), member.getPassword());
-        if (!matches) {
-            throw new InvalidSigninInformation();
-        }
+
+//        boolean matches = passwordEncoder.matches(login.getPassword(), member.getPassword());
+//        if (!matches) {
+//            throw new InvalidSigninInformation();
+//        }
 
         // 토근을 응답
         Session session = member.addSession();
-        return session.getAccessToken();
+        return member.getId();
     }
 
     public void signup(Signup signup) {

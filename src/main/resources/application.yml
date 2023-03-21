@@ -22,3 +22,6 @@ spring:
 #  sql:
 #    init:
 #      mode: always
+
+jlog:
+  jwt-key: "B9FcCRGDJjO8WAsE2eAcsT6cszyecPEps61+jVTahDg="
