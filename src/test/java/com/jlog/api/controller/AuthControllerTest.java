@@ -1,12 +1,16 @@
 package com.jlog.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jlog.api.config.AppConfig;
 import com.jlog.api.domain.Member;
 import com.jlog.api.domain.Session;
 import com.jlog.api.repository.MemberRepository;
 import com.jlog.api.repository.SessionRepository;
 import com.jlog.api.request.Login;
 import com.jlog.api.request.Signup;
+import com.jlog.api.service.AuthService;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +19,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.crypto.SecretKey;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +42,13 @@ class AuthControllerTest {
     @Autowired
     MockMvc mockMvc;
     @Autowired
+    AuthService authService;
+    @Autowired
     MemberRepository memberRepository;
     @Autowired
     SessionRepository sessionRepository;
+    @Autowired
+    AppConfig appConfig;
 
     @BeforeEach
     void clean() {
@@ -141,10 +151,25 @@ class AuthControllerTest {
         Session session = member.addSession();
         memberRepository.save(member);
 
+        Login login = Login.builder()
+                .email("jhseong112@naver.com")
+                .password("1234")
+                .build();
+
+        Long userId = authService.signin(login);
+
+        SecretKey key = Keys.hmacShaKeyFor(appConfig.getJwtKey());
+
+        String jws = Jwts.builder()
+                .setSubject(String.valueOf(userId))
+                .signWith(key)
+                .setIssuedAt(new Date())
+                .compact();
+
         // expected
         mockMvc.perform(get("/foo")
                         .contentType(APPLICATION_JSON)
-                        .header("Authorization", session.getAccessToken())
+                        .header("Authorization", jws)
                 )
                 .andExpect(status().isOk())
                 .andDo(print());

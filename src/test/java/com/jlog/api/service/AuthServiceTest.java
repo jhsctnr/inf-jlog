@@ -84,7 +84,7 @@ class AuthServiceTest {
         // given
         Member member = Member.builder()
                 .email("jhseong112@naver.com")
-                .password(encrypt)
+                .password("1234")
                 .name("유재석")
                 .build();
         memberRepository.save(member);
@@ -95,7 +95,7 @@ class AuthServiceTest {
                 .build();
 
         // when
-        String userId = authService.signin(login);
+        long userId = authService.signin(login);
 
         // then
         assertNotNull(userId);
