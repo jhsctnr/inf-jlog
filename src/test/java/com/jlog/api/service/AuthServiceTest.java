@@ -38,7 +38,7 @@ class AuthServiceTest {
         Signup signup = Signup.builder()
                 .password("1234")
                 .email("jhseong112@naver.com")
-                .name("정해성")
+                .nickname("정해성")
                 .build();
 
         // when
@@ -51,7 +51,7 @@ class AuthServiceTest {
         assertEquals("jhseong112@naver.com", member.getEmail());
         assertNotNull(member.getPassword());
         assertEquals("1234", member.getPassword());
-        assertEquals("정해성", member.getName());
+        assertEquals("정해성", member.getNickname());
     }
 
     @Test
@@ -61,14 +61,14 @@ class AuthServiceTest {
         Member member = Member.builder()
                 .email("jhseong112@naver.com")
                 .password("12324")
-                .name("유재석")
+                .nickname("유재석")
                 .build();
         memberRepository.save(member);
 
         Signup signup = Signup.builder()
                 .password("1234")
                 .email("jhseong112@naver.com")
-                .name("정해성")
+                .nickname("정해성")
                 .build();
 
         // expected
@@ -85,7 +85,7 @@ class AuthServiceTest {
         Member member = Member.builder()
                 .email("jhseong112@naver.com")
                 .password("1234")
-                .name("유재석")
+                .nickname("유재석")
                 .build();
         memberRepository.save(member);
 
@@ -95,10 +95,10 @@ class AuthServiceTest {
                 .build();
 
         // when
-        long userId = authService.signin(login);
+        Member findMember = authService.signin(login);
 
         // then
-        assertNotNull(userId);
+        assertNotNull(findMember);
     }
 
     @Test
@@ -112,7 +112,7 @@ class AuthServiceTest {
         Member member = Member.builder()
                 .email("jhseong112@naver.com")
                 .password(encrypt)
-                .name("유재석")
+                .nickname("유재석")
                 .build();
         memberRepository.save(member);
 

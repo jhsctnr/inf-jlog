@@ -1,6 +1,8 @@
 package com.jlog.api.controller;
 
 import com.jlog.api.config.AppConfig;
+import com.jlog.api.domain.Member;
+import com.jlog.api.repository.MemberRepository;
 import com.jlog.api.request.Login;
 import com.jlog.api.request.Signup;
 import com.jlog.api.response.SessionResponse;
@@ -22,24 +24,27 @@ import java.util.Date;
 public class AuthController {
 
     private final AuthService authService;
+    private final MemberRepository memberRepository;
     private final AppConfig appConfig;
 
     @PostMapping("/auth/login")
     public SessionResponse login(@RequestBody Login login) {
-        Long userId = authService.signin(login);
-
-        SecretKey key = Keys.hmacShaKeyFor(appConfig.getJwtKey());
-
 //        Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 //        byte[] encodedKey = key.getEncoded();
 //        String strKey = Base64.getEncoder().encodeToString(encodedKey);
+
+        Member member = authService.signin(login);
+
+
+        SecretKey key = Keys.hmacShaKeyFor(appConfig.getJwtKey());
+
         String jws = Jwts.builder()
-                .setSubject(String.valueOf(userId))
+                .setSubject(String.valueOf(member.getId()))
                 .signWith(key)
                 .setIssuedAt(new Date())
                 .compact();
 
-        return new SessionResponse(jws);
+        return new SessionResponse(jws, member.getNickname());
     }
 
 //    @PostMapping("/auth/login")

@@ -1,12 +1,17 @@
 package com.jlog.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jlog.api.config.AppConfig;
+import com.jlog.api.domain.Member;
 import com.jlog.api.domain.Post;
+import com.jlog.api.repository.MemberRepository;
 import com.jlog.api.repository.PostRepository;
 import com.jlog.api.request.PostCreate;
 import com.jlog.api.request.PostEdit;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +19,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.crypto.SecretKey;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -22,7 +29,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -34,8 +42,12 @@ class PostControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private AppConfig appConfig;
 
-    @BeforeEach
+    @AfterEach
     void clean() {
         postRepository.deleteAll();
     }
@@ -46,13 +58,29 @@ class PostControllerTest {
     void test2() throws Exception {
         // given
         PostCreate request = PostCreate.builder()
-                .content("내용입니다.")
+                .contents("내용입니다.")
                 .build();
         String json = objectMapper.writeValueAsString(request);
+
+        Member member = Member.builder()
+                .email("jhseong112@naver.com")
+                .password("12324")
+                .nickname("유재석")
+                .build();
+        memberRepository.save(member);
+
+        SecretKey key = Keys.hmacShaKeyFor(appConfig.getJwtKey());
+
+        String jws = Jwts.builder()
+                .setSubject(String.valueOf(member.getId()))
+                .signWith(key)
+                .setIssuedAt(new Date())
+                .compact();
 
         // expected
         mockMvc.perform(post("/posts")
                         .contentType(APPLICATION_JSON)
+                                .header("Authorization", jws)
                 // {"title": ""}
                 // {"title": null}
                         .content(json)
@@ -70,13 +98,28 @@ class PostControllerTest {
         // given
         PostCreate request = PostCreate.builder()
                 .title("제목입니다.")
-                .content("내용입니다.")
+                .contents("내용입니다.")
                 .build();
         String json = objectMapper.writeValueAsString(request);
 
+        Member member = Member.builder()
+                .email("jhseong112@naver.com")
+                .password("12324")
+                .nickname("유재석")
+                .build();
+        memberRepository.save(member);
+
+        SecretKey key = Keys.hmacShaKeyFor(appConfig.getJwtKey());
+
+        String jws = Jwts.builder()
+                .setSubject(String.valueOf(member.getId()))
+                .signWith(key)
+                .setIssuedAt(new Date())
+                .compact();
+
         // when
         mockMvc.perform(post("/posts")
-                        .header("authorization", "wh")
+                        .header("Authorization", jws)
                         .contentType(APPLICATION_JSON)
                         .content(json)
                 )
@@ -87,7 +130,7 @@ class PostControllerTest {
 
         Post findPost = postRepository.findAll().get(0);
         assertThat(findPost.getTitle()).isEqualTo("제목입니다.");
-        assertThat(findPost.getContent()).isEqualTo("내용입니다.");
+        assertThat(findPost.getContents()).isEqualTo("내용입니다.");
     }
 
     @Test
@@ -96,7 +139,7 @@ class PostControllerTest {
         // given
         Post post = Post.builder()
                 .title("123456789012345")
-                .content("bar")
+                .contents("bar")
                 .build();
 
         postRepository.save(post);
@@ -107,8 +150,8 @@ class PostControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(post.getId()))
-                .andExpect(jsonPath("$.title").value("1234567890"))
-                .andExpect(jsonPath("$.content").value("bar"))
+                .andExpect(jsonPath("$.title").value("123456789012345"))
+                .andExpect(jsonPath("$.contents").value("bar"))
                 .andDo(print());
     }
 
@@ -119,7 +162,7 @@ class PostControllerTest {
         List<Post> requestPosts = IntStream.range(1, 31)
                 .mapToObj(i -> Post.builder()
                         .title("포스트 제목 " + i)
-                        .content("반포자이 " + i)
+                        .contents("반포자이 " + i)
                         .build())
                 .collect(Collectors.toList());
         postRepository.saveAll(requestPosts);
@@ -141,7 +184,7 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.length()", Matchers.is(10)))
                 .andExpect(jsonPath("$[0].id").value(requestPosts.get(requestPosts.size() - 1).getId()))
                 .andExpect(jsonPath("$[0].title").value("포스트 제목 30"))
-                .andExpect(jsonPath("$[0].content").value("반포자이 30"))
+                .andExpect(jsonPath("$[0].contents").value("반포자이 30"))
                 .andDo(print());
     }
 
@@ -151,13 +194,13 @@ class PostControllerTest {
         // given
         Post post = Post.builder()
                 .title("해성맨")
-                .content("반포자이")
+                .contents("반포자이")
                 .build();
         postRepository.save(post);
 
         PostEdit postEdit = PostEdit.builder()
                 .title("해성걸")
-                .content("반포자이")
+                .contents("반포자이")
                 .build();
 
         // expected
@@ -175,7 +218,7 @@ class PostControllerTest {
         // given
         Post post = Post.builder()
                 .title("해성맨")
-                .content("반포자이")
+                .contents("반포자이")
                 .build();
         postRepository.save(post);
 
@@ -204,11 +247,11 @@ class PostControllerTest {
         // given
         PostEdit postEdit = PostEdit.builder()
                 .title("해성")
-                .content("반포자이")
+                .contents("반포자이")
                 .build();
 
         // expected
-        mockMvc.perform(patch("/posts/{postId}", 1L)
+        mockMvc.perform(patch("/posts/{postId}", 100L)
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(postEdit))
                 )
@@ -222,13 +265,29 @@ class PostControllerTest {
         // given
         PostCreate request = PostCreate.builder()
                 .title("나는 바보입니다.")
-                .content("내용입니다.")
+                .contents("내용입니다.")
                 .build();
         String json = objectMapper.writeValueAsString(request);
+
+        Member member = Member.builder()
+                .email("jhseong112@naver.com")
+                .password("12324")
+                .nickname("유재석")
+                .build();
+        memberRepository.save(member);
+
+        SecretKey key = Keys.hmacShaKeyFor(appConfig.getJwtKey());
+
+        String jws = Jwts.builder()
+                .setSubject(String.valueOf(member.getId()))
+                .signWith(key)
+                .setIssuedAt(new Date())
+                .compact();
 
         // when
         mockMvc.perform(post("/posts")
                         .contentType(APPLICATION_JSON)
+                                .header("Authorization", jws)
                         // {"title": ""}
                         // {"title": null}
                         .content(json)

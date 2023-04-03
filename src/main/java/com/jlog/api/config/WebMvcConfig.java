@@ -20,6 +20,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
         resolvers.add(new AuthResolver(sessionRepository, appConfig));
     }
 
+
+
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/**")
+//                .allowedOrigins("http://localhost:8081");
+//    }
+
 //    @Override
 //    public void addInterceptors(InterceptorRegistry registry) {
 //        registry.addInterceptor(new AuthInterceptor())

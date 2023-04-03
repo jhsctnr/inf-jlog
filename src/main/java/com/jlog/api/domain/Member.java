@@ -19,7 +19,7 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String nickname;
 
     private String email;
 
@@ -31,8 +31,8 @@ public class Member {
     private List<Session> sessions = new ArrayList<>();
 
     @Builder
-    public Member(String name, String email, String password) {
-        this.name = name;
+    public Member(String nickname, String email, String password) {
+        this.nickname = nickname;
         this.email = email;
         this.password = password;
         this.createdAt = LocalDateTime.now();

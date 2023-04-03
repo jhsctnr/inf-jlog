@@ -6,11 +6,13 @@ import lombok.Getter;
 public class PostEditor {
 
     private final String title;
-    private final String content;
+    private final String contents;
+    private final String createdBy;
 
-    public PostEditor(String title, String content) {
+    public PostEditor(String title, String contents, String createdBy) {
         this.title = title;
-        this.content = content;
+        this.contents = contents;
+        this.createdBy = createdBy;
     }
 
     public static PostEditorBuilder builder() {
@@ -19,7 +21,8 @@ public class PostEditor {
 
     public static class PostEditorBuilder {
         private String title;
-        private String content;
+        private String contents;
+        private String createdBy;
 
         PostEditorBuilder() {
         }
@@ -29,17 +32,27 @@ public class PostEditor {
             return this;
         }
 
-        public PostEditorBuilder content(final String content) {
-            this.content = content;
+        public PostEditorBuilder contents(final String contents) {
+            this.contents = contents;
+            return this;
+        }
+
+        public PostEditorBuilder createdBy(final String createdBy) {
+            this.createdBy = createdBy;
             return this;
         }
 
         public PostEditor build() {
-            return new PostEditor(this.title, this.content);
+            return new PostEditor(this.title, this.contents, this.createdBy);
         }
 
+        @Override
         public String toString() {
-            return "PostEditor.PostEditorBuilder(title=" + this.title + ", content=" + this.content + ")";
+            return "PostEditorBuilder{" +
+                    "title='" + title + '\'' +
+                    ", contents='" + contents + '\'' +
+                    ", createdBy='" + createdBy + '\'' +
+                    '}';
         }
     }
 }

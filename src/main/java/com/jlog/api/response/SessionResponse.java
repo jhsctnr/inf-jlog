@@ -6,8 +6,10 @@ import lombok.Getter;
 public class SessionResponse {
 
     private final String accessToken;
+    private final String userName;
 
-    public SessionResponse(String accessToken) {
+    public SessionResponse(String accessToken, String userName) {
         this.accessToken = accessToken;
+        this.userName = userName;
     }
 }

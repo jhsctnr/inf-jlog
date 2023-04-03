@@ -1,13 +1,16 @@
 package com.jlog.api.service;
 
+import com.jlog.api.config.data.UserSession;
+import com.jlog.api.domain.Member;
 import com.jlog.api.domain.Post;
 import com.jlog.api.exception.PostNotFound;
+import com.jlog.api.repository.MemberRepository;
 import com.jlog.api.repository.PostRepository;
 import com.jlog.api.request.PostCreate;
 import com.jlog.api.request.PostEdit;
 import com.jlog.api.request.PostSearch;
 import com.jlog.api.response.PostResponse;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +31,10 @@ class PostServiceTest {
     PostService postService;
     @Autowired
     PostRepository postRepository;
+    @Autowired
+    MemberRepository memberRepository;
 
-    @BeforeEach
+    @AfterEach
     void clean() {
         postRepository.deleteAll();
     }
@@ -40,17 +45,26 @@ class PostServiceTest {
         // given
         PostCreate postCreate = PostCreate.builder()
                 .title("제목입니다.")
-                .content("내용입니다.")
+                .contents("내용입니다.")
+                .build();
+        Member member = Member.builder()
+                .email("jhseong112@naver.com")
+                .password("1234")
+                .nickname("해성")
                 .build();
 
+        memberRepository.save(member);
+
+        UserSession userSession = new UserSession(member.getId());
+
         // when
-        postService.write(postCreate);
+        postService.write(postCreate, userSession);
 
         // then
         assertThat(postRepository.count()).isEqualTo(1L);
         Post findPost = postRepository.findAll().get(0);
         assertThat(findPost.getTitle()).isEqualTo("제목입니다.");
-        assertThat(findPost.getContent()).isEqualTo("내용입니다.");
+        assertThat(findPost.getContents()).isEqualTo("내용입니다.");
     }
 
     @Test
@@ -59,7 +73,7 @@ class PostServiceTest {
         // given
         Post post = Post.builder()
                 .title("foo")
-                .content("bar")
+                .contents("bar")
                 .build();
         postRepository.save(post);
 
@@ -76,7 +90,7 @@ class PostServiceTest {
         assertThat(response).isNotNull();
         assertThat(postRepository.count()).isEqualTo(1L);
         assertThat(response.getTitle()).isEqualTo("foo");
-        assertThat(response.getContent()).isEqualTo("bar");
+        assertThat(response.getContents()).isEqualTo("bar");
     }
 
     @Test
@@ -86,7 +100,7 @@ class PostServiceTest {
         List<Post> requestPosts = IntStream.range(0, 20)
                 .mapToObj(i -> Post.builder()
                         .title("foo" + i)
-                        .content("bar" + i)
+                        .contents("bar" + i)
                         .build())
                 .collect(Collectors.toList());
         postRepository.saveAll(requestPosts);
@@ -113,13 +127,13 @@ class PostServiceTest {
         // given
         Post post = Post.builder()
                 .title("해성맨")
-                .content("반포자이")
+                .contents("반포자이")
                 .build();
         postRepository.save(post);
 
         PostEdit postEdit = PostEdit.builder()
                 .title("해성걸")
-                .content("반포자이")
+                .contents("반포자이")
                 .build();
         // when
         postService.edit(post.getId(), postEdit);
@@ -128,7 +142,7 @@ class PostServiceTest {
         Post changedPost = postRepository.findById(post.getId())
                 .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. id=" + post.getId()));
         assertThat(changedPost.getTitle()).isEqualTo("해성걸");
-        assertThat(changedPost.getContent()).isEqualTo("반포자이");
+        assertThat(changedPost.getContents()).isEqualTo("반포자이");
     }
 
     @Test
@@ -137,13 +151,13 @@ class PostServiceTest {
         // given
         Post post = Post.builder()
                 .title("해성맨")
-                .content("반포자이")
+                .contents("반포자이")
                 .build();
         postRepository.save(post);
 
         PostEdit postEdit = PostEdit.builder()
                 .title("해성맨")
-                .content("초가집")
+                .contents("초가집")
                 .build();
         // when
         postService.edit(post.getId(), postEdit);
@@ -152,7 +166,7 @@ class PostServiceTest {
         Post changedPost = postRepository.findById(post.getId())
                 .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. id=" + post.getId()));
         assertThat(changedPost.getTitle()).isEqualTo("해성맨");
-        assertThat(changedPost.getContent()).isEqualTo("초가집");
+        assertThat(changedPost.getContents()).isEqualTo("초가집");
     }
 
     @Test
@@ -161,7 +175,7 @@ class PostServiceTest {
         // given
         Post post = Post.builder()
                 .title("해성맨")
-                .content("반포자이")
+                .contents("반포자이")
                 .build();
         postRepository.save(post);
 
@@ -178,7 +192,7 @@ class PostServiceTest {
         // given
         Post post = Post.builder()
                 .title("foo")
-                .content("bar")
+                .contents("bar")
                 .build();
         postRepository.save(post);
 
@@ -194,7 +208,7 @@ class PostServiceTest {
         // given
         Post post = Post.builder()
                 .title("해성맨")
-                .content("반포자이")
+                .contents("반포자이")
                 .build();
         postRepository.save(post);
 
@@ -209,13 +223,13 @@ class PostServiceTest {
         // given
         Post post = Post.builder()
                 .title("해성맨")
-                .content("반포자이")
+                .contents("반포자이")
                 .build();
         postRepository.save(post);
 
         PostEdit postEdit = PostEdit.builder()
                 .title("해성맨")
-                .content("초가집")
+                .contents("초가집")
                 .build();
         // expected
         assertThatThrownBy(() ->

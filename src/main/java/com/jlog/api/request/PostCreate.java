@@ -15,16 +15,16 @@ public class PostCreate {
     @NotBlank(message = "타이틀을 입력해주세요.")
     private String title;
     @NotBlank(message = "콘텐츠를 입력해주세요.")
-    private String content;
+    private String contents;
 
     // 빌더의 장점
     //  - 가독성에 좋다.
     //  - 필요한 값만 받을 수 있다. // -> (오버로딩 가능한 조건은?)
     //  - 객체의 불변성
     @Builder
-    public PostCreate(String title, String content) {
+    public PostCreate(String title, String contents) {
         this.title = title;
-        this.content = content;
+        this.contents = contents;
     }
 
     public void validate() {

@@ -11,10 +11,18 @@ spring:
         default-page-size: 5
 
   datasource:
-    url: jdbc:h2:mem:jlog
+    url: jdbc:h2:tcp://localhost/~/jlog
     username: sa
     password:
     driver-class-name: org.h2.Driver
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+
+server:
+  port: 3000
 
 #  jpa:
 #    defer-datasource-initialization: true

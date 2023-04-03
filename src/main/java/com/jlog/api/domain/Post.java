@@ -3,6 +3,7 @@ package com.jlog.api.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -14,22 +15,27 @@ public class Post {
     private Long id;
     private String title;
     @Lob
-    private String content;
+    private String contents;
+    private String createdBy;
+    private LocalDateTime createdAt;
 
     @Builder
-    public Post(String title, String content) {
+    public Post(String title, String contents, String createdBy) {
         this.title = title;
-        this.content = content;
+        this.contents = contents;
+        this.createdBy = createdBy;
+        this.createdAt = LocalDateTime.now();
     }
 
     public PostEditor.PostEditorBuilder toEditor() {
         return PostEditor.builder()
                 .title(title)
-                .content(content);
+                .contents(contents)
+                .createdBy(createdBy);
     }
 
     public void edit(PostEditor postEditor) {
         title = postEditor.getTitle();
-        content = postEditor.getContent();
+        contents = postEditor.getContents();
     }
 }

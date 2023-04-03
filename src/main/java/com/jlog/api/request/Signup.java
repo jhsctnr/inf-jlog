@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 public class Signup {
 
-    private String name;
+    private String nickname;
     private String password;
     private String email;
 }

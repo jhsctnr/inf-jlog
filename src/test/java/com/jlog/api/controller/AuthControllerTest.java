@@ -60,7 +60,7 @@ class AuthControllerTest {
     void test() throws Exception {
         // given
         memberRepository.save(Member.builder()
-                .name("해성")
+                .nickname("해성")
                 .email("jhseong112@naver.com")
                 .password("1234")
                 .build());
@@ -86,7 +86,7 @@ class AuthControllerTest {
     void test2() throws Exception {
         // given
         Member member = memberRepository.save(Member.builder()
-                .name("해성")
+                .nickname("해성")
                 .email("jhseong112@naver.com")
                 .password("1234")
                 .build());
@@ -115,7 +115,7 @@ class AuthControllerTest {
     void test3() throws Exception {
         // given
         Member member = memberRepository.save(Member.builder()
-                .name("해성")
+                .nickname("해성")
                 .email("jhseong112@naver.com")
                 .password("1234")
                 .build());
@@ -144,7 +144,7 @@ class AuthControllerTest {
     void test4() throws Exception {
         // given
         Member member = memberRepository.save(Member.builder()
-                .name("해성")
+                .nickname("해성")
                 .email("jhseong112@naver.com")
                 .password("1234")
                 .build());
@@ -156,12 +156,12 @@ class AuthControllerTest {
                 .password("1234")
                 .build();
 
-        Long userId = authService.signin(login);
+        Member findMember = authService.signin(login);
 
         SecretKey key = Keys.hmacShaKeyFor(appConfig.getJwtKey());
 
         String jws = Jwts.builder()
-                .setSubject(String.valueOf(userId))
+                .setSubject(String.valueOf(findMember.getId()))
                 .signWith(key)
                 .setIssuedAt(new Date())
                 .compact();
@@ -180,7 +180,7 @@ class AuthControllerTest {
     void test5() throws Exception {
         // given
         Member member = memberRepository.save(Member.builder()
-                .name("해성")
+                .nickname("해성")
                 .email("jhseong112@naver.com")
                 .password("1234")
                 .build());
@@ -203,7 +203,7 @@ class AuthControllerTest {
         Signup signup = Signup.builder()
                 .password("1234")
                 .email("jhseong112@naver.com")
-                .name("정해성")
+                .nickname("정해성")
                 .build();
 
         // expected

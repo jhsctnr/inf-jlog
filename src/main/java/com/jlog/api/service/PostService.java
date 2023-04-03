@@ -1,8 +1,12 @@
 package com.jlog.api.service;
 
+import com.jlog.api.config.data.UserSession;
+import com.jlog.api.domain.Member;
 import com.jlog.api.domain.Post;
 import com.jlog.api.domain.PostEditor;
+import com.jlog.api.exception.InvalidSigninInformation;
 import com.jlog.api.exception.PostNotFound;
+import com.jlog.api.repository.MemberRepository;
 import com.jlog.api.repository.PostRepository;
 import com.jlog.api.request.PostCreate;
 import com.jlog.api.request.PostEdit;
@@ -22,12 +26,18 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final MemberRepository memberRepository;
 
-    public void write(PostCreate postCreate) {
+    public void write(PostCreate postCreate, UserSession userSession) {
+
+        Member findMember = memberRepository.findById(userSession.getId())
+                .orElseThrow(InvalidSigninInformation::new);
+
         // postCreate -> Entity
         Post post = Post.builder()
                 .title(postCreate.getTitle())
-                .content(postCreate.getContent())
+                .contents(postCreate.getContents())
+                .createdBy(findMember.getNickname())
                 .build();
 
         postRepository.save(post);
@@ -47,7 +57,7 @@ public class PostService {
         return PostResponse.builder()
                 .id(findPost.getId())
                 .title(findPost.getTitle())
-                .content(findPost.getContent())
+                .contents(findPost.getContents())
                 .build();
     }
 
@@ -66,7 +76,7 @@ public class PostService {
 
         PostEditor postEditor = editorBuilder
                 .title(postEdit.getTitle())
-                .content(postEdit.getContent())
+                .contents(postEdit.getContents())
                 .build();
 
         post.edit(postEditor);

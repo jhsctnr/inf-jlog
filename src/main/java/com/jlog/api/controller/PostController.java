@@ -43,8 +43,8 @@ public class PostController {
 
     @GetMapping("/foo")
     public Long foo(UserSession userSession) {
-        log.info(">>> {}", userSession.id);
-        return userSession.id;
+        log.info(">>> {}", userSession.getId());
+        return userSession.getId();
     }
 
     @GetMapping("/bar")
@@ -59,9 +59,9 @@ public class PostController {
     // 2. POST(body) value -> X
     // 3. Header
     @PostMapping("/posts") // content-type -> json
-    public void post(@RequestBody @Valid PostCreate request) {
+    public void post(@RequestBody @Valid PostCreate request, UserSession userSession) {
         request.validate();
-        postService.write(request);
+        postService.write(request, userSession);
     }
 
     /**
