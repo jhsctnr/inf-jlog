@@ -15,6 +15,25 @@
     <RouterLink to="/add" class="create-button">
       <i class="ion-md-add" />
     </RouterLink>
+
+    <v-container fluid>
+      <v-row align="center">
+        <v-col class="d-flex" cols="12" sm="6">
+          <FactorySelect />
+        </v-col>
+        <v-col class="d-flex" cols="12" sm="6">
+          <DeptSelect />
+        </v-col>
+      </v-row>
+      <v-row align="center">
+        <v-col class="d-flex" cols="12" sm="6">
+          <FactorySelect />
+        </v-col>
+        <v-col class="d-flex" cols="12" sm="6">
+          <DeptSelect />
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
@@ -22,6 +41,8 @@
 import PostListItem from '@/components/posts/PostListItem.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { fetchPosts } from '@/api/posts';
+import DeptSelect from '@/components/testcomp/DeptSelect.vue';
+import FactorySelect from '@/components/testcomp/FactorySelect.vue';
 
 export default {
   data() {
@@ -49,6 +70,8 @@ export default {
   components: {
     PostListItem,
     LoadingSpinner,
+    DeptSelect,
+    FactorySelect,
   },
 };
 </script>

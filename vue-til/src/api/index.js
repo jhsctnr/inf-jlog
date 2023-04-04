@@ -15,5 +15,13 @@ function createInstanceWithAuth(url) {
   return setInterceptors(instance);
 }
 
+function createInstanceWithAuthForProd(url) {
+  const instance = axios.create({
+    baseURL: url,
+  });
+  return setInterceptors(instance);
+}
+
 export const instance = createInstance();
 export const posts = createInstanceWithAuth('/api/posts');
+export const products = createInstanceWithAuthForProd('/api');

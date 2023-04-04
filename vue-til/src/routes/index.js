@@ -34,6 +34,7 @@ const router = new VueRouter({
     {
       path: '/test',
       component: () => import('@/views/TestPage.vue'),
+      meta: { auth: true },
     },
     {
       path: '/add',

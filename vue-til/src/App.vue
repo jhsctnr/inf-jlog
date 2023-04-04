@@ -1,7 +1,6 @@
 <template>
   <v-app id="inspire">
     <AppHeader />
-
     <v-main class="grey lighten-3">
       <v-container>
         <v-row>
@@ -18,9 +17,7 @@
                     <v-list-item-title> test </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-
                 <v-divider class="my-2"></v-divider>
-
                 <v-list-item link color="grey lighten-4">
                   <v-list-item-content>
                     <v-list-item-title> Refresh </v-list-item-title>
@@ -29,7 +26,6 @@
               </v-list>
             </v-sheet>
           </v-col>
-
           <v-col>
             <v-sheet min-height="70vh" rounded="lg">
               <RouterView />
@@ -45,9 +41,6 @@
 import AppHeader from '@/components/common/AppHeader.vue';
 
 export default {
-  data: () => ({
-    links: ['Dashboard', 'Messages', 'Profile', 'Updates'],
-  }),
   components: {
     AppHeader,
   },

@@ -55,6 +55,13 @@ export default {
           password: this.password,
         };
         await this.$store.dispatch('LOGIN', userData);
+
+        const factories = await this.$store.dispatch('FETCH_FACTORIES');
+        console.log(factories);
+
+        const depts = await this.$store.dispatch('FETCH_DEPTS');
+        console.log(depts);
+
         this.$router.push('/main');
       } catch (error) {
         this.logMessage = error.response.data.message;

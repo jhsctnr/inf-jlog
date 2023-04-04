@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { deleteCookie } from '@/utils/cookies';
+import { deleteAllCookies } from '@/utils/cookies';
 
 export default {
   computed: {
@@ -50,8 +50,13 @@ export default {
     logoutUser() {
       this.$store.commit('clearUsername');
       this.$store.commit('clearToken');
-      deleteCookie('til_auth');
-      deleteCookie('til_user');
+      // deleteCookie('til_auth');
+      // deleteCookie('til_user');
+      // deleteCookie('til_factories');
+      // deleteCookie('til_depts');
+      // deleteCookie('til_factory');
+      // deleteCookie('til_dept');
+      deleteAllCookies();
       this.$router.push('/login');
     },
   },
