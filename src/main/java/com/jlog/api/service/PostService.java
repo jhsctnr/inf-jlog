@@ -44,7 +44,7 @@ public class PostService {
     }
 
     public PostResponse get(Long id) {
-        Post findPost = postRepository.findById(id)
+        Post findPost = postRepository.getPost(id)
                 .orElseThrow(PostNotFound::new);
 
         /**
